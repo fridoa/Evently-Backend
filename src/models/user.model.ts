@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { encrypt } from "../utils/password";
 
-export interface User {
+export interface IUser {
   fullName: string;
   username: string;
   email: string;
@@ -9,11 +10,12 @@ export interface User {
   profilePicture: string;
   isActive: boolean;
   activationCode: string;
+  comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
 const Schema = mongoose.Schema;
 
-const UserSchema = new Schema<User>(
+const UserSchema = new Schema<IUser>(
   {
     fullName: {
       type: String,
@@ -34,6 +36,7 @@ const UserSchema = new Schema<User>(
       type: String,
       enum: ["user", "admin"],
       default: "user",
+      required: true,
     },
     profilePicture: {
       type: String,
@@ -45,7 +48,6 @@ const UserSchema = new Schema<User>(
     },
     activationCode: {
       type: String,
-      default: "",
     },
   },
   {
@@ -53,5 +55,13 @@ const UserSchema = new Schema<User>(
   }
 );
 
-const UserModel = mongoose.model<User>("User", UserSchema);
+UserSchema.pre("save", async function (next) {
+  const user = this;
+  if (!user.isModified("password")) return next();
+
+  user.password = await encrypt(user.password);
+  next();
+});
+
+const UserModel = mongoose.model<IUser>("User", UserSchema);
 export default UserModel;
