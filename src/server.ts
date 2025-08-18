@@ -9,6 +9,13 @@ async function init() {
 
     const { PORT } = process.env;
 
+    app.get("/", (req, res) => {
+      res.json({
+        message: "Server is running!",
+        data: null,
+      });
+    });
+
     app.listen(PORT, () => {
       console.log(`🚀 Server is running on http://localhost:${PORT}`);
     });
