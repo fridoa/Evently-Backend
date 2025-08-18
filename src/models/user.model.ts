@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { encrypt } from "../utils/password";
+import { encrypt, verifyPassword } from "../utils/password";
 
 export interface IUser {
   fullName: string;
@@ -55,6 +55,7 @@ const UserSchema = new Schema<IUser>(
   }
 );
 
+// Hash password before saving to the database
 UserSchema.pre("save", async function (next) {
   const user = this;
   if (!user.isModified("password")) return next();
@@ -62,6 +63,18 @@ UserSchema.pre("save", async function (next) {
   user.password = await encrypt(user.password);
   next();
 });
+
+// Method to compare password
+UserSchema.methods.comparePassword = function (candidatePassword: string): Promise<boolean> {
+  return verifyPassword(candidatePassword, this.password);
+};
+
+// menghapus password dari output JSON
+UserSchema.methods.toJSON = function () {
+  const user = this.toObject();
+  delete user.password;
+  return user;
+};
 
 const UserModel = mongoose.model<IUser>("User", UserSchema);
 export default UserModel;
