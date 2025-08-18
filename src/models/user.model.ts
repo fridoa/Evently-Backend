@@ -10,7 +10,6 @@ export interface IUser {
   profilePicture: string;
   isActive: boolean;
   activationCode: string;
-  comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
 const Schema = mongoose.Schema;
@@ -24,9 +23,14 @@ const UserSchema = new Schema<IUser>(
     username: {
       type: String,
       required: true,
+      unique: true,
+      lowercase: true,
     },
     email: {
       type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
     },
     password: {
       type: String,

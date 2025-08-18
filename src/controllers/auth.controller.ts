@@ -2,11 +2,14 @@ import { Request, Response } from "express";
 import * as Yup from "yup";
 import UserModel from "../models/user.model";
 import { verifyPassword } from "../utils/password";
+import { generateToken } from "../utils/jwt";
+import { IReqUser } from "../middlewares/auth.middleware";
 
 type TRegister = {
   fullName: string;
   username: string;
   email: string;
+  role?: string;
   password: string;
   confirmPassword: string;
 };
@@ -20,6 +23,7 @@ const registerValidateSchema = Yup.object({
   fullName: Yup.string().required(),
   username: Yup.string().required(),
   email: Yup.string().email().required(),
+  role: Yup.string().optional(),
   password: Yup.string().required(),
   confirmPassword: Yup.string()
     .required()
@@ -28,12 +32,13 @@ const registerValidateSchema = Yup.object({
 
 export default {
   async register(req: Request, res: Response) {
-    const { fullName, username, email, password, confirmPassword } = req.body as unknown as TRegister;
+    const { fullName, username, email, role, password, confirmPassword } = req.body as unknown as TRegister;
     try {
       await registerValidateSchema.validate({
         fullName,
         username,
         email,
+        role,
         password,
         confirmPassword,
       });
@@ -42,6 +47,7 @@ export default {
         fullName,
         username,
         email,
+        role: role || "user",
         password,
       });
       await result.save();
@@ -89,9 +95,33 @@ export default {
         });
       }
 
+      // generate token
+      const token = generateToken({
+        id: userByIdentifier._id,
+        role: userByIdentifier.role,
+      });
+
       res.status(200).json({
         message: "Login successful!",
-        data: userByIdentifier,
+        data: token,
+      });
+    } catch (error) {
+      const err = error as unknown as Error;
+      res.status(400).json({
+        message: err.message,
+        data: null,
+      });
+    }
+  },
+
+  async me(req: IReqUser, res: Response) {
+    try {
+      const user = req.user;
+      const result = await UserModel.findById(user?.id);
+
+      res.status(200).json({
+        message: "Success get user profile!",
+        data: result,
       });
     } catch (error) {
       const err = error as unknown as Error;
