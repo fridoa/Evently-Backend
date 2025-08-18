@@ -2,6 +2,9 @@ import express from "express";
 import router from "./routes/api";
 import bodyParser from "body-parser";
 import db from "./utils/database";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 async function init() {
   try {
@@ -13,7 +16,7 @@ async function init() {
 
     app.use(bodyParser.json());
 
-    const PORT = 3000;
+    const { PORT } = process.env;
 
     app.use("/api/v1", router);
 
