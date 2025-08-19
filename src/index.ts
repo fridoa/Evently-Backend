@@ -7,6 +7,12 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use("/api/v1", router);
+app.get("/", (req, res) => {
+  res.json({
+    message: "Server is running!",
+    data: null,
+  });
+});
 
 if (process.env.NODE_ENV === "production") {
   db()
