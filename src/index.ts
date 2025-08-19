@@ -18,6 +18,13 @@ async function init() {
 
     const { PORT } = process.env;
 
+    app.get("/", (req, res) => {
+      res.status(200).json({
+        message: "Welcome to Evently API",
+        data: null,
+      });
+    });
+
     app.use("/api/v1", router);
 
     app.listen(PORT, () => {
