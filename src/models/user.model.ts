@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
 import { encrypt, verifyPassword } from "../utils/password";
+import { renderMail, sendMail } from "../utils/mail/mail";
+import { create } from "ts-node";
+import { CLIENT_HOST, EMAIL_SMTP_USER } from "../utils/env";
 
 export interface IUser {
   fullName: string;
@@ -10,6 +13,7 @@ export interface IUser {
   profilePicture: string;
   isActive: boolean;
   activationCode: string;
+  createdAt?: string;
 }
 
 const Schema = mongoose.Schema;
@@ -62,10 +66,37 @@ const UserSchema = new Schema<IUser>(
 // Hash password before saving to the database
 UserSchema.pre("save", async function (next) {
   const user = this;
-  if (!user.isModified("password")) return next();
+  if (!user.isModified("password")) {
+    return next();
+  }
 
   user.password = await encrypt(user.password);
   next();
+});
+
+UserSchema.post("save", async function (doc, next) {
+  try {
+    const user = doc;
+
+    console.log("Send email to : ", user.email);
+
+    const contentMail = await renderMail("registration-success.ejs", {
+      username: user.username,
+      fullName: user.fullName,
+      email: user.email,
+      createdAt: user.createdAt,
+      activationLink: `${CLIENT_HOST}/auth/activation/${user.activationCode}`,
+    });
+    await sendMail({
+      from: EMAIL_SMTP_USER,
+      to: user.email,
+      subject: "Aktivasi Akun Evently",
+      html: contentMail,
+    });
+  } catch (error) {
+  } finally {
+    next();
+  }
 });
 
 // Method to compare password

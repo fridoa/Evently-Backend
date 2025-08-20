@@ -3,10 +3,10 @@ import swaggerUi from "swagger-ui-express";
 import swaggerOutput from "./swagger-output.json";
 
 export default (app: Express) => {
-  // Setup Swagger dengan dokumentasi Zyvent API
+  // Setup Swagger dengan dokumentasi Evently API
   const options = {
     explorer: true,
-    customSiteTitle: "Zyvent API Documentation",
+    customSiteTitle: "Evently API Documentation",
     customCss: `
       .swagger-ui .topbar { display: none }
       .swagger-ui .info { margin: 50px 0 }
