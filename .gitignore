@@ -1,3 +1,4 @@
 /node_modules
 /.env
 src/docs/swagger-output.json
+.vercel

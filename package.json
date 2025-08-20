@@ -7,8 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/index.ts",
     "docs": "ts-node src/docs/swagger.ts",
-    "vercel-build": "npm run docs && tsc",
-    "postbuild": "copy src\\docs\\swagger-output.json dist\\swagger-output.json"
+    "vercel-build": "npm run docs && tsc"
   },
   "keywords": [],
   "author": "",
