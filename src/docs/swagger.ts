@@ -32,7 +32,7 @@ const doc = {
   },
 };
 
-const OutputFile = "./swagger-output.json";
+const OutputFile = "./src/docs/swagger-output.json";
 const endpointsFile = ["./src/routes/api.ts"];
 
 swaggerAutogen({
