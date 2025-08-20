@@ -24,6 +24,13 @@ const doc = {
       },
     },
     schemas: {
+      RegisterRequest: {
+        fullName: "string",
+        username: "string",
+        email: "string",
+        password: "string",
+        confirmPassword: "string",
+      },
       LoginRequest: {
         identifier: "string",
         password: "string",

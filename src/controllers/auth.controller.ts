@@ -1,55 +1,24 @@
 import { Request, Response } from "express";
-import * as Yup from "yup";
 import UserModel from "../models/user.model";
 import { verifyPassword } from "../utils/password";
 import { generateToken } from "../utils/jwt";
 import { IReqUser } from "../middlewares/auth.middleware";
-
-type TRegister = {
-  fullName: string;
-  username: string;
-  email: string;
-  role?: string;
-  password: string;
-  confirmPassword: string;
-};
-
-type TLogin = {
-  identifier: string;
-  password: string;
-};
-
-const registerValidateSchema = Yup.object({
-  fullName: Yup.string().required(),
-  username: Yup.string().required(),
-  email: Yup.string().email().required(),
-  role: Yup.string().optional(),
-  password: Yup.string().required(),
-  confirmPassword: Yup.string()
-    .required()
-    .oneOf([Yup.ref("password")], "Passwords must be~ match"),
-});
+import { TLogin, TRegister, registerSchema, loginSchema } from "../validators/auth.schema";
 
 export default {
   async register(req: Request, res: Response) {
-    const { fullName, username, email, role, password, confirmPassword } = req.body as unknown as TRegister;
+    /**
+     #swagger.summary = "Register a new user"
+     #swagger.tags = ["Auth"]
+      #swagger.requestBody = {
+        required: true,
+        schema: {$ref: "#/components/schemas/RegisterRequest"}
+      }
+     */
     try {
-      await registerValidateSchema.validate({
-        fullName,
-        username,
-        email,
-        role,
-        password,
-        confirmPassword,
-      });
+      const data: TRegister = await registerSchema.validate(req.body);
 
-      const result = new UserModel({
-        fullName,
-        username,
-        email,
-        role: role || "user",
-        password,
-      });
+      const result = new UserModel(data);
       await result.save();
 
       res.status(200).json({
@@ -67,13 +36,15 @@ export default {
 
   async login(req: Request, res: Response) {
     /**
+    #swagger.summary = "Login user"
+    #swagger.tags = ["Auth"]
      #swagger.requestBody = {
      required: true,
      schema: {$ref: "#/components/schemas/LoginRequest"}
      }
      */
-    const { identifier, password } = req.body as unknown as TLogin;
     try {
+      const { identifier, password }: TLogin = await loginSchema.validate(req.body);
       // ambil data user berdasarkan "identifier" -> email atau username
       const userByIdentifier = await UserModel.findOne({
         $or: [
@@ -122,6 +93,7 @@ export default {
 
   async me(req: IReqUser, res: Response) {
     /**
+     #swagger.tags = ["Auth"]
      #swagger.security = [{
        "bearerAuth": []
      }]
