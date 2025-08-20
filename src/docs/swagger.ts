@@ -10,10 +10,6 @@ const doc = {
       url: "http://localhost:8000/api/v1",
       description: "Local server",
     },
-    {
-      url: "https://evently-backend-z2jj.vercel.app/api/v1",
-      description: "Production server",
-    },
   ],
 
   components: {
