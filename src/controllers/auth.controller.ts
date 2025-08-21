@@ -4,6 +4,7 @@ import { verifyPassword } from "../utils/password";
 import { generateToken } from "../utils/jwt";
 import { IReqUser } from "../middlewares/auth.middleware";
 import { TLogin, TRegister, registerSchema, loginSchema } from "../validators/auth.schema";
+import { sendActivationEmail } from "../services/user.service";
 
 export default {
   async register(req: Request, res: Response) {
@@ -18,12 +19,15 @@ export default {
     try {
       const data: TRegister = await registerSchema.validate(req.body);
 
-      const result = new UserModel(data);
-      await result.save();
+      const user = new UserModel(data);
+      await user.save();
+
+      // Send Email
+      await sendActivationEmail(user);
 
       res.status(200).json({
         message: "Registration successful!",
-        data: result,
+        data: user,
       });
     } catch (error) {
       const err = error as unknown as Error;
@@ -55,14 +59,17 @@ export default {
             username: identifier,
           },
         ],
+        isActive: true,
       });
 
+      // jika user tidak ditemukan
       if (!userByIdentifier) {
         return res.status(404).json({
-          message: "User not found",
+          message: "User not found ",
           data: null,
         });
       }
+
       // verifikasi password
       const validatePassword: boolean = await verifyPassword(password, userByIdentifier.password);
       if (!validatePassword) {
@@ -105,6 +112,43 @@ export default {
       res.status(200).json({
         message: "Success get user profile!",
         data: result,
+      });
+    } catch (error) {
+      const err = error as unknown as Error;
+      res.status(400).json({
+        message: err.message,
+        data: null,
+      });
+    }
+  },
+
+  async activation(req: Request, res: Response) {
+    /**
+      #swagger.summary = "Activate user account"
+      #swagger.tags = ["Auth"]
+      #swagger.requestBody = {
+        required: true,
+        schema: {$ref: "#/components/schemas/ActivationRequest"}
+      }
+     */
+    try {
+      const { code } = req.body as { code: string };
+
+      const user = await UserModel.findOneAndUpdate(
+        {
+          activationCode: code,
+        },
+        {
+          isActive: true,
+        },
+        {
+          new: true,
+        }
+      );
+
+      res.status(200).json({
+        message: "Account activated successfully!",
+        data: user,
       });
     } catch (error) {
       const err = error as unknown as Error;

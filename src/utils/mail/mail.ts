@@ -4,29 +4,31 @@ import ejs from "ejs";
 import path from "path";
 
 const transporter = nodemailer.createTransport({
-  service: EMAIL_SMTP_SERVICE_NAME,
-  host: EMAIL_SMTP_HOST,
-  port: EMAIL_SMTP_PORT,
+  service: process.env.EMAIL_SMTP_SERVICE_NAME,
+  host: process.env.EMAIL_SMTP_HOST,
+  port: Number(process.env.EMAIL_SMTP_PORT),
+  secure: process.env.EMAIL_SMTP_SECURE === "true",
   auth: {
-    user: EMAIL_SMTP_USER,
-    pass: EMAIL_SMTP_PASS,
+    user: process.env.EMAIL_SMTP_USER,
+    pass: process.env.EMAIL_SMTP_PASS,
   },
-  secure: EMAIL_SMTP_SECURE,
   requireTLS: true,
 });
 
 export interface ISendMail {
-  from: string;
+  from?: string; 
   to: string;
   subject: string;
   html: string;
 }
 
-export const sendMail = async ({ ...mailParams }: ISendMail) => {
-  const result = await transporter.sendMail({
-    ...mailParams,
+export const sendMail = async ({ from, to, subject, html }: ISendMail) => {
+  return await transporter.sendMail({
+    from: from || `"Evently Support" <${process.env.EMAIL_SMTP_USER}>`, 
+    to,
+    subject,
+    html,
   });
-  return result;
 };
 
 export const renderMail = async (template: string, data: any): Promise<string> => {

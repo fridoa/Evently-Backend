@@ -31,6 +31,9 @@ const doc = {
         password: "string",
         confirmPassword: "string",
       },
+      ActivationRequest: {
+        code: "string",
+      },
       LoginRequest: {
         identifier: "string",
         password: "string",
