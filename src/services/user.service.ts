@@ -8,7 +8,7 @@ export async function sendActivationEmail(user: IUser) {
     fullName: user.fullName,
     email: user.email,
     createdAt: user.createdAt,
-    activationLink: `${CLIENT_HOST}/auth/activation/${user.activationCode}`,
+    activationLink: `${CLIENT_HOST}/auth/activation?code=${user.activationCode}`,
   });
   await sendMail({
     to: user.email,
