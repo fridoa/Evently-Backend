@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { encrypt, verifyPassword } from "../utils/password";
+import { ROLES } from "../utils/constant";
 
 export interface IUser {
   fullName: string;
@@ -39,8 +40,8 @@ const UserSchema = new Schema<IUser>(
     },
     role: {
       type: String,
-      enum: ["user", "admin"],
-      default: "user",
+      enum: [ROLES.ADMIN, ROLES.MEMBER],
+      default: ROLES.MEMBER,
       required: true,
     },
     profilePicture: {
