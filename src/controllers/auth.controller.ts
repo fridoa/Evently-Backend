@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import UserModel from "../models/user.model";
 import { verifyPassword } from "../utils/password";
 import { generateToken } from "../utils/jwt";
-import { IReqUser } from "../middlewares/auth.middleware";
 import { TLogin, TRegister, registerSchema, loginSchema } from "../validators/auth.schema";
 import { sendActivationEmail } from "../services/user.service";
+import { IReqUser } from "../utils/interfaces";
 
 export default {
   async register(req: Request, res: Response) {

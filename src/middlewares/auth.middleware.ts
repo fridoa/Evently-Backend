@@ -1,9 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { getUserData, IUserToken } from "../utils/jwt";
-
-export interface IReqUser extends Request {
-  user?: IUserToken;
-}
+import { getUserData } from "../utils/jwt";
+import { IReqUser } from "../utils/interfaces";
 
 export default (req: Request, res: Response, next: NextFunction) => {
   const authorization = req.headers?.authorization;
@@ -17,7 +14,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
 
   const [prefix, token] = authorization.split(" ");
 
-  if(!(prefix === "Bearer" && token)) {
+  if (!(prefix === "Bearer" && token)) {
     return res.status(403).json({
       message: "unauthorized",
       data: null,
@@ -33,7 +30,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
     });
   }
 
-    (req as IReqUser).user = user;
+  (req as IReqUser).user = user;
 
-    next();
+  next();
 };
