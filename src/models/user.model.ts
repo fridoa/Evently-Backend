@@ -9,6 +9,7 @@ export interface IUser {
   password: string;
   role: string;
   profilePicture: string;
+  profilePictureId: string | null;
   isActive: boolean;
   activationCode: string;
   createdAt?: string;
@@ -47,6 +48,10 @@ const UserSchema = new Schema<IUser>(
     profilePicture: {
       type: String,
       default: "user.png",
+    },
+    profilePictureId: {
+      type: String,
+      default: null,
     },
     isActive: {
       type: Boolean,
