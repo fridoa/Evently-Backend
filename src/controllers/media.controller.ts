@@ -1,63 +1,40 @@
 import { Response } from "express";
 import { IReqUser } from "../utils/interfaces";
 import uploader from "../utils/uploader";
+import response from "../utils/response";
 
 export default {
   async single(req: IReqUser, res: Response) {
     if (!req.file) {
-      return res.status(400).json({
-        message: "No file uploaded",
-        data: null,
-      });
+      return response.error(res, null, "File not found");
     }
 
     try {
       const result = await uploader.uploadSingle(req.file as Express.Multer.File);
-      res.status(200).json({
-        message: "File uploaded successfully",
-        data: result,
-      });
+      response.success(res, result, "File uploaded successfully");
     } catch {
-      res.status(500).json({
-        message: "File upload failed",
-        data: null,
-      });
+      response.error(res, null, "File upload failed");
     }
   },
   async multiple(req: IReqUser, res: Response) {
     if (!req.files || req.files.length === 0) {
-      return res.status(400).json({
-        message: "No files uploaded",
-        data: null,
-      });
+      return response.error(res, null, "Files not found");
     }
 
     try {
       const result = await uploader.uploadMultiple(req.files as Express.Multer.File[]);
-      res.status(200).json({
-        message: "Files uploaded successfully",
-        data: result,
-      });
+      response.success(res, result, "Files uploaded successfully");
     } catch {
-      res.status(500).json({
-        message: "Files upload failed",
-        data: null,
-      });
+      response.error(res, null, "Files upload failed");
     }
   },
   async remove(req: IReqUser, res: Response) {
     const { publicId } = req.body as { publicId: string };
     try {
-      await uploader.remove(publicId);
-      res.status(200).json({
-        message: "File removed successfully",
-        data: null,
-      });
+      const result = await uploader.remove(publicId);
+      response.success(res, result, "File removed successfully");
     } catch {
-      res.status(500).json({
-        message: "File removal failed",
-        data: null,
-      });
+      response.error(res, null, "File remove failed");
     }
   },
 };
