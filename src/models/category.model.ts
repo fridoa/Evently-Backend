@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 import { TCategory } from "../validators/category.schema";
 
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
 const categorySchema = new Schema<TCategory>({
   name: {

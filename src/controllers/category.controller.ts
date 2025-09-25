@@ -1,6 +1,6 @@
 import { Response } from "express";
 import CategoryModel from "../models/category.model";
-import { categorySchema, TCategory } from "../validators/category.schema";
+import { categorySchema } from "../validators/category.schema";
 import response from "../utils/response";
 import { IPaginationQuery, IReqUser } from "../utils/interfaces";
 
