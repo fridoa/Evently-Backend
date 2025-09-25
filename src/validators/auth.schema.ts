@@ -1,7 +1,6 @@
 import * as Yup from "yup";
 import { passwordRules } from "../utils/passwordRules";
 
-// Schema untuk Register
 export const registerSchema = Yup.object({
   fullName: Yup.string().required("Full name is required"),
   username: Yup.string().required("Username is required"),
@@ -12,12 +11,10 @@ export const registerSchema = Yup.object({
     .oneOf([Yup.ref("password")], "Passwords must match"),
 });
 
-// Schema untuk Login
 export const loginSchema = Yup.object({
   identifier: Yup.string().required("Username or Email is required"),
   password: Yup.string().required("Password is required"),
 });
 
-// Types otomatis dari Yup
 export type TRegister = Yup.InferType<typeof registerSchema>;
 export type TLogin = Yup.InferType<typeof loginSchema>;
