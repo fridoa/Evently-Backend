@@ -3,7 +3,7 @@ import * as Yup from "yup";
 
 type Pagination = {
   totalPages: number;
-  currentPages: number;
+  currentPage: number;
   total: number;
 };
 

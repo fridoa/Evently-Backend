@@ -37,7 +37,7 @@ export default {
         .skip((page - 1) * limit)
         .sort({ createdAt: -1 })
         .exec();
-      response.pagination(res, "success find all category", { total: count, totalPages: Math.ceil(count / limit), currentPages: page }, result);
+      response.pagination(res, "success find all category", { total: count, totalPages: Math.ceil(count / limit), currentPage: page }, result);
     } catch (error) {
       response.error(res, error, "failed find all category");
     }
