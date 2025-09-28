@@ -4,7 +4,7 @@ import { TCategory } from "../validators/category.schema";
 
 const { Schema } = mongoose;
 
-const categorySchema = new Schema<TCategory>({
+const CategorySchema = new Schema<TCategory>({
   name: {
     type: String,
     required: true,
@@ -19,6 +19,6 @@ const categorySchema = new Schema<TCategory>({
   },
 });
 
-const CategoryModel = mongoose.model("Category", categorySchema);
+const CategoryModel = mongoose.model("Category", CategorySchema);
 
 export default CategoryModel;

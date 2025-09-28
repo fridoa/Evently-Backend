@@ -1,8 +1,9 @@
 import { Response } from "express";
 import CategoryModel from "../models/category.model";
-import { categorySchema } from "../validators/category.schema";
+import { categorySchema, TCategory } from "../validators/category.schema";
 import response from "../utils/response";
 import { IPaginationQuery, IReqUser } from "../utils/interfaces";
+import { FilterQuery } from "mongoose";
 
 export default {
   async create(req: IReqUser, res: Response) {
@@ -15,10 +16,9 @@ export default {
     }
   },
   async findAll(req: IReqUser, res: Response) {
-    const { page = 1, limit = 10, search } = req.query as unknown as IPaginationQuery;
-
     try {
-      const query = {};
+      const { page = 1, limit = 10, search } = req.query as unknown as IPaginationQuery;
+      const query: FilterQuery<TCategory> = {};
       if (search) {
         Object.assign(query, {
           $or: [
@@ -31,12 +31,16 @@ export default {
           ],
         });
       }
-      const count = await CategoryModel.countDocuments(query);
-      const result = await CategoryModel.find(query)
-        .limit(limit)
-        .skip((page - 1) * limit)
-        .sort({ createdAt: -1 })
-        .exec();
+
+      const [count, result] = await Promise.all([
+        CategoryModel.countDocuments(query),
+        CategoryModel.find(query)
+          .limit(limit)
+          .skip((page - 1) * limit)
+          .sort({ createdAt: -1 })
+          .exec(),
+      ]);
+
       response.pagination(res, "success find all category", { total: count, totalPages: Math.ceil(count / limit), currentPage: page }, result);
     } catch (error) {
       response.error(res, error, "failed find all category");
@@ -65,7 +69,7 @@ export default {
   async remove(req: IReqUser, res: Response) {
     try {
       const { id } = req.params;
-      const result = await CategoryModel.findByIdAndDelete(id);
+      const result = await CategoryModel.findByIdAndDelete(id, { new: true });
       response.success(res, result, "success remove category");
     } catch (error) {
       response.error(res, error, "failed remove category");
