@@ -1,5 +1,6 @@
 import mongoose, { ObjectId } from "mongoose";
 import { TEvent } from "../validators/event.schema";
+import generateUniqueSlug from "../utils/slug";
 
 export interface IEvent extends Omit<TEvent, "category" | "createdBy"> {
   category: ObjectId;
@@ -52,7 +53,7 @@ const EventSchema = new Schema<IEvent>(
       unique: true,
     },
     createdBy: {
-      type: String,
+      type: Schema.Types.ObjectId,
       required: true,
       ref: "User",
     },
@@ -71,10 +72,11 @@ const EventSchema = new Schema<IEvent>(
   }
 );
 
-EventSchema.pre("save", function (next) {
-  if (!this.slug) {
-    const slug = this.name.split(" ").join("-").toLowerCase();
-    this.slug = `${slug}`;
+EventSchema.index({ name: "text", description: "text" });
+
+EventSchema.pre("save", async function (next) {
+  if (this.isModified("name") || this.isNew) {
+    this.slug = await generateUniqueSlug(this.name, this.constructor as mongoose.Model<any>);
   }
   next();
 });

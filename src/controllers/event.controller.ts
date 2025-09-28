@@ -21,12 +21,8 @@ export default {
     try {
       const { page = 1, limit = 10, search } = req.query as unknown as IPaginationQuery;
       const query: FilterQuery<TEvent> = {};
-      if (search) {
-        Object.assign(query, {
-          $text: {
-            $search: search,
-          },
-        });
+      if (search && search.trim() !== "") {
+        query.$text = { $search: search.trim() };
       }
 
       const [count, result] = await Promise.all([
@@ -63,7 +59,7 @@ export default {
   async remove(req: IReqUser, res: Response) {
     try {
       const { id } = req.params;
-      const result = await EventModel.findByIdAndDelete(id, { new: true });
+      const result = await EventModel.findByIdAndDelete(id);
       response.success(res, result, "success remove event");
     } catch (error) {
       response.error(res, error, "failed remove event");

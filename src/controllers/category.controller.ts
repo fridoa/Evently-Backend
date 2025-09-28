@@ -19,17 +19,9 @@ export default {
     try {
       const { page = 1, limit = 10, search } = req.query as unknown as IPaginationQuery;
       const query: FilterQuery<TCategory> = {};
-      if (search) {
-        Object.assign(query, {
-          $or: [
-            {
-              name: { $regex: search, $options: "i" },
-            },
-            {
-              description: { $regex: search, $options: "i" },
-            },
-          ],
-        });
+      if (search && search.trim() !== "") {
+        const searchRegex = new RegExp(search.trim(), "i");
+        query.$or = [{ name: { $regex: searchRegex } }, { description: { $regex: searchRegex } }];
       }
 
       const [count, result] = await Promise.all([
@@ -69,7 +61,7 @@ export default {
   async remove(req: IReqUser, res: Response) {
     try {
       const { id } = req.params;
-      const result = await CategoryModel.findByIdAndDelete(id, { new: true });
+      const result = await CategoryModel.findByIdAndDelete(id);
       response.success(res, result, "success remove category");
     } catch (error) {
       response.error(res, error, "failed remove category");
